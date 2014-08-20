@@ -46,15 +46,41 @@ class SVM_model(object):
         self.debug()
         cv2.waitKey(0)
 
-    def eval(self, sample):
-
+    def eval(self, features, rects):
         results = []
+        for i in range(len(features)):
+            res = self.evaluate(features[i], rects[i])
+            results.append(res)
+        return results
 
-    def update(self, ):
-        pass
+    def update(self, features, rects, centerindex):
+        sp = Support_pattern()
+        for i in range(len(rects)):
+            sp.yv.append(rects[i])
+        sp.x = features
+        sp.y = centerindex
+        sp.refCount = 0
+        self.__sps.append(sp)
 
-    def loss(self, y1, y2):
-        pass
+        self.process_new(len(self.__sps)-1)
+        self.budget_maintenance()
+
+        for i in range(10):
+            self.reprocess()
+            self.budget_maintenance()
+
+    def loss(self, r1, r2):
+        x1, y1, w1, h1 = r1
+        x2, y2, w2, h2 = r2
+        xp1 = max(x1,x2)
+        yp1 = max(y1,y2)
+        xp2 = min(x1+w1, x2+w2)
+        yp2 = min(y1+h1, y2+h2)
+        if xp1 >= xp2 or yp1 >= yp2:
+            return 0.0
+        overlap = (xp2-xp1) * (yp2-yp1)
+        score = float(overlap) / (w1*h1 + w2*h2 - overlap)
+        return 1 - score
 
     def evaluate(self, x, yRect):
         f = 0.0
