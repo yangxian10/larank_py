@@ -5,6 +5,7 @@ import sys
 import cv2
 import random
 
+'''
 class Support_pattern(object):
     def __init__(self):
         self.x = []
@@ -20,6 +21,7 @@ class Support_vector(object):
         self.b = 0.0
         self.g = 0.0
         self.image = []
+'''
 
 class SVM_model(object):
     def __init__(self, svmC=100.0, svmBudgetSize=100):
@@ -33,8 +35,13 @@ class SVM_model(object):
             N = self.__kMaxSVs
         self.__K = np.mat(np.zeros((N,N)))
         self.__debugImage = np.zeros((800,600))
-        self.__sps = []
-        self.__svs = []
+#       self.__sps = []
+#       self.__svs = []
+        self.__g = []
+        self.__b = []
+        self.__x = []
+        self.__y = []
+        self.__Rects = []
 
     def test(self):
         a = self.__K
@@ -84,13 +91,13 @@ class SVM_model(object):
 
     def evaluate(self, x, yRect):
         f = 0.0
-        for i in range(len(self.__svs)):
-            f += self.__svs[i].b * x.dot(self.__svs[i].x[self.__svs[i].y])
+        for i in range(len(self.__b)):
+            f += self.__b[i] * x.dot(self.__x[i])
         return f
 
     def budget_maintenance(self):
         if self.__svmBudgetSize > 0:
-            while len(self.__svs) > self.__svmBudgetSize:
+            while len(self.__b) > self.__svmBudgetSize:
                 self.budget_maintenance_remove()
 
     def reprocess(self):
@@ -112,27 +119,29 @@ class SVM_model(object):
     def SMOstep(self, ipos, ineg):
         if ipos == ineg:
             return
-        svp = self.__svs[ipos]
-        svn = self.__svs[ineg]
-        assert svp.x == svn.x
-        sp = svp.x
+        svp_g = self.__g[ipos]
+        svn_g = self.__g[ineg]
+#       assert svp.x == svn.x
+        svp_b = self.__b[ipos]
+        svn_b = self.__b[ineg]
+        sp_x = self.__x[ipos]
+        sp_y = self.__y[ipos]
 
-        if svp.g - svn.g > 1e-5:
+        if svp_g - svn_g > 1e-5:
             kii = self.__K[ipos,ipos] + self.__K[ineg,ineg] - self.__K[ipos,ineg]
-            ru = (svp.g - svn.g) / kii
-            r = min(ru, self.__C*int(svp.y == sp.y)-svp.b)
-            svp.b += r
-            svn.b -= r
-            for i in range(len(self.__svs)):
-                svi = self.__svs[i]
-                svi.g -= r * (self.__K[i,ipos] - self.__K[i,ineg])
+            ru = (svp_g - svn_g) / kii
+            r = min(ru, self.__C*int(sp_y == 0)-svp_b)
+            svp_b += r
+            svn_b -= r
+            for i in range(len(self.__b)):
+                self.__g[i] -= r * (self.__K[i,ipos] - self.__K[i,ineg])
 
-        if abs(svp.b) < 1e-8:
+        if abs(svp_b) < 1e-8:
             self.remove_support_vector(ipos)
-            if ineg == len(self.__svs):
+            if ineg == len(self.__b):
                 ineg = ipos
 
-        if abs(svn.b) < 1e-8:
+        if abs(svn_b) < 1e-8:
             self.remove_support_vector(ineg)
 
     def min_gradient(self, index):
@@ -215,6 +224,7 @@ class SVM_model(object):
         index = len(self.__svs)
         self.__svs.append(sv)
         x.refCount += 1
+
 
         for i in range(index):
             self.__K[i,index] = self.__svs[i].x.x[self.__svs[i].y].dot(x.x[y])
