@@ -72,7 +72,8 @@ while (not gotBB):
 
 print 'init tracking box =x:',bx,'y:',by,'w:',bw,'h:',bh
 box = [bx,by,bw,bh]
-ddt.init(grayframe, box)
+ddt_tracker = ddt.tracker()
+ddt_tracker.init(grayframe, box)
 
 # run
 while (flag):
@@ -80,7 +81,7 @@ while (flag):
     start = time.time()
     grayframe = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     grayframe = cv2.GaussianBlur(grayframe, (7,7), 1.5)
-    rect = ddt.process_frame(grayframe, box)
+    rect = ddt_tracker.process_frame(grayframe, box)
     bx,by,bw,bh
     #cv2.waitKey(50)
     cv2.rectangle(frame,(bx,by),(bx+bw,by+bh), (0,0,255))

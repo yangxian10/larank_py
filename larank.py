@@ -98,7 +98,7 @@ class SVM_model(object):
         for i in range(10):
             self.optimize()
 
-'''
+    '''
     def compute_dual(self):
         d = 0.0
         for i in range(len(self.__svs)):
@@ -107,7 +107,7 @@ class SVM_model(object):
             for j in range(len(self.__svs)):
                 d -= 0.5 * sv.b * self.__svs[j].b * self.__K[i,j]
         return d
-'''
+    '''
 
     def SMOstep(self, ipos, ineg):
         if ipos == ineg:
