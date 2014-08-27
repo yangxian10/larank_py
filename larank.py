@@ -36,6 +36,7 @@ class SVM_model(object):
         self.__sps = []
         self.__svs = []
 
+    '''
     def test(self):
         a = self.__K
         b = self.__C
@@ -45,6 +46,7 @@ class SVM_model(object):
         #cv2.imshow("debug", self.__debugImage)
         self.debug()
         cv2.waitKey(0)
+    '''
 
     def eval(self, features, rects):
         results = []
@@ -85,7 +87,7 @@ class SVM_model(object):
     def evaluate(self, x, yRect):
         f = 0.0
         for i in range(len(self.__svs)):
-            f += self.__svs[i].b * x.dot(self.__svs[i].x[self.__svs[i].y])
+            f += self.__svs[i].b * (x.dot(self.__svs[i].x.x[self.__svs[i].y]))
         return f
 
     def budget_maintenance(self):
@@ -173,9 +175,9 @@ class SVM_model(object):
         min_grad_index, min_grad_val = self.min_gradient(index)
         idn = -1
         for i in range(len(self.__svs)):
-            if self.__svs.x != self.__sps[index]:
+            if self.__svs[i].x != self.__sps[index]:
                 continue
-            if self.__svs.y == min_grad_index:
+            if self.__svs[i].y == min_grad_index:
                 idn = i
                 break
         if idn == -1:

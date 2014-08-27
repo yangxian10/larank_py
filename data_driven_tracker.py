@@ -22,7 +22,9 @@ class tracker(object):
             x, y, w, h = rects[i]
             train_imgs.append(inimg[y:(y+h), x:(x+w)])
         f, self.__V, blk = pca_net.train(train_imgs)
+        print 'finish train filter V'
         self.update_learner(inimg, box)
+        print 'finish init'
 
     def process_frame(self, inimg, box):
         # detect
@@ -82,6 +84,6 @@ class tracker(object):
             test_imgs.append(img[y:(y+h), x:(x+w)])
         features = []
         for i in range(len(test_imgs)):
-            f, blk = pca_net.feaExt(test_imgs[i], self.__V)
+            f, blk = pca_net.feaExt([test_imgs[i]], self.__V)
             features.append(f)
-        return features6
+        return features
