@@ -52,8 +52,8 @@ class tracker(object):
             rects.append(box)
             for ir in range(1,6):
                 for it in range(16):
-                    dx = ir*rstep*math.cos(it*tstep)
-                    dy = ir*rstep*math.sin(it*tstep)
+                    dx = round(ir*rstep*math.cos(it*tstep))
+                    dy = round(ir*rstep*math.sin(it*tstep))
                     x = xb + dx
                     y = yb + dy
                     w = wb
@@ -71,11 +71,12 @@ class tracker(object):
                     h = hb
                     rects.append([x,y,w,h])
         img_h, img_w = np.shape(img)
+        out_rects = []
         for i in range(len(rects)):
             x, y, w, h = rects[i]
-            if x<0 or y<0 or (x+w)>img_w or (y+h)>img_h:
-                rects.pop(i)
-        return rects
+            if x>=0 and y>=0 and (x+w)<=img_w and (y+h)<=img_h:
+                out_rects.append(rects[i])
+        return out_rects
 
     def get_feature(self, img, rects):
         test_imgs = []

@@ -12,7 +12,7 @@ import data_driven_tracker as ddt
 print 'python implemented by yang xian'
 print 'Version 1.0'
 print 'email yang_xian521@163.com'
-print 'date 2014/8/125'
+print 'date 2014/8/25'
 
 gotBB = False
 drawing = False
@@ -80,9 +80,8 @@ while (flag):
     flag, frame = cap.read()
     start = time.time()
     grayframe = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    grayframe = cv2.GaussianBlur(grayframe, (7,7), 1.5)
+#   grayframe = cv2.GaussianBlur(grayframe, (7,7), 1.5)
     rect = ddt_tracker.process_frame(grayframe, box)
-    bx,by,bw,bh
     #cv2.waitKey(50)
     cv2.rectangle(frame,(bx,by),(bx+bw,by+bh), (0,0,255))
     end = time.time()
@@ -97,4 +96,4 @@ while (flag):
     elif key == ord('p'):
         cv2.waitKey(0)
 
-cv2.destroyWindow('dsr')
+cv2.destroyWindow('ddt')
