@@ -3,6 +3,7 @@
 __author__ = 'yangxian'
 
 import numpy as np
+import cv2
 import math
 import larank
 import pca_net
@@ -14,6 +15,7 @@ class tracker(object):
         self.__searchRadius = 30
         self.__learner = larank.SVM_model(self.__svmC, self.__svmBudgetSize)
         self.__V = []
+        self.__debugModel = True
 
     def init(self, inimg, box):
         rects = self.get_rects(inimg, box, self.__searchRadius, 1)
@@ -33,6 +35,9 @@ class tracker(object):
         scores = self.__learner.eval(features, rects)
         best_score = max(scores)
         best_index = scores.index(best_score)
+        # debug information
+        if self.__debugModel:
+            self.show_debug_information(rects, box, scores)
         # learn
         self.update_learner(inimg, rects[best_index])
         return rects[best_index]
@@ -88,3 +93,17 @@ class tracker(object):
             f, blk = pca_net.feaExt([test_imgs[i]], self.__V)
             features.append(f)
         return features
+
+    def show_debug_information(self, rects, center, scores):
+        #print 'best score/index: %d,%d' % best_score % best_index
+        max_val = max(scores)
+        min_val = min(scores)
+        tracking_confidence_map = np.zeros((self.__searchRadius*2+1, self.__searchRadius*2+1))
+        xc, yc, wc, hc = center
+        for i in range(len(rects)):
+            xr, yr, wr, hr = rects[i]
+            x = int(xr - xc) + self.__searchRadius
+            y = int(yr - yc) + self.__searchRadius
+            tracking_confidence_map[y, x] = float(scores[i] - min_val) / (max_val - min_val)
+        cv2.imshow("tracking_confidence_map", tracking_confidence_map)
+        self.__learner.debug()

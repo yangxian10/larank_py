@@ -9,7 +9,7 @@ class Support_pattern(object):
     def __init__(self):
         self.x = []
         self.yv = []
-        self.images = []
+        #self.images = []
         self.y = 0
         self.refCount = 0
 
@@ -19,7 +19,7 @@ class Support_vector(object):
         self.y = 0
         self.b = 0.0
         self.g = 0.0
-        self.image = []
+        #self.image = []
 
 class SVM_model(object):
     def __init__(self, svmC=100.0, svmBudgetSize=100):
@@ -32,9 +32,10 @@ class SVM_model(object):
         else:
             N = self.__kMaxSVs
         self.__K = np.mat(np.zeros((N,N)))
-        self.__debugImage = np.zeros((800,600))
+        #self.__debugImage = np.zeros((800,600))
         self.__sps = []
         self.__svs = []
+        #self.__debugModel = True
 
     '''
     def test(self):
@@ -280,8 +281,21 @@ class SVM_model(object):
     def debug(self):
         print "%s//%s--support patterns/vectors" % (len(self.__sps), len(self.__svs))
         self.update_debug_image()
-        cv2.imshow("learner", self.__debugImage)
+        b = []
+        for i in range(self.__svs):
+            b.append(self.__svs[i].b)
+        print "support vectors B:"
+        print b
+        print "------------------"
 
     def update_debug_image(self):
-        pass
+        #debug_image = np.zeros((800, 600))
+        svs_size = len(self.__svs)
+        max_val = np.max(self.__K)
+        min_val = np.min(self.__K)
+        K = np.array(self.__K.shape)
+        for i in range(svs_size):
+            for j in range(svs_size):
+                K[i,j] = float(self.__K[i,j] - min_val) / (max_val - min_val)
+        cv2.imshow("learner_K", K)
 
